@@ -1,5 +1,6 @@
 //src/models/user.js
 import connection from "../config/db.js";
+import bcrypt from 'bcryptjs';
 
 // consultas toda la tabla user
 export const getAllUsers = (callback) => {
@@ -23,13 +24,13 @@ export const getUserById = (id, callback) => {
 
 // Función para crear un nuevo usuario
 export const createUser = (userData, callback) => {
+  const hashedPassword = bcrypt.hashSync(userData.password, 10);
   const query =
-    "INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)";
+    "INSERT INTO users ( name, email, password) VALUES (?, ?, ?)";
   const values = [
-    userData.userId,
     userData.name,
     userData.email,
-    userData.password,
+    hashedPassword,
   ];
 
   connection.query(query, values, (err, result) => {

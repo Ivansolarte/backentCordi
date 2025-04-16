@@ -1,69 +1,37 @@
-// models/package
-import connection from "../config/db.js";
+import db from "../config/db.js"; // Aquí debes importar tu configuración de conexión a la base de datos (MySQL, etc.)
 
-// Consultar todos los paquetes
+// Obtener todos los paquetes
 export const getAllPackages = (callback) => {
-  const query = "SELECT * FROM packages";
-  connection.query(query, (err, results) => {
-    if (err) {
-      console.error("❌ Error fetching packages:", err);
-      return callback(err, null);
-    }
-    callback(null, results);
-  });
+  db.query("SELECT * FROM packages", callback);
 };
 
-// Consultar paquete por ID
+// Obtener un paquete por ID
 export const getPackageById = (id, callback) => {
-  const query = "SELECT * FROM packages WHERE id = ?";
-  connection.query(query, [id], (err, results) => {
-    callback(err, results);
-  });
+  db.query("SELECT * FROM packages WHERE id = ?", [id], callback);
 };
 
-// Crear nuevo paquete
-export const createPackage = (packageData, callback) => {
-  const query = "INSERT INTO packages (shipment_id, weight, length, width, height, product_type) VALUES (?, ?, ?, ?, ?, ?)";
-  const values = [
-    packageData.shipment_id,
-    packageData.weight,
-    packageData.length,
-    packageData.width,
-    packageData.height,
-    packageData.product_type,
-  ];
-
-  connection.query(query, values, (err, result) => {
-    if (err) {
-      console.error("❌ Error creating package:", err);
-      return callback(err, null);
-    }
-    callback(null, { id: result.insertId, ...packageData });
-  });
+// Crear un nuevo paquete
+export const createPackage = (newPackage, callback) => {
+  const { packageId, shipment_id, weight, length, width, height, product_type } = newPackage;
+  const query = `
+    INSERT INTO packages (id, shipment_id, weight, length, width, height, product_type) 
+    VALUES (UUID(), ?, ?, ?, ?, ?, ?)
+  `;
+  db.query(query, [shipment_id, weight, length, width, height, product_type], callback);
 };
 
-// Actualizar paquete
-export const updatePackageById = (id, packageData, callback) => {
-  const { weight, length, width, height, product_type } = packageData;
-  const query =
-    "UPDATE packages SET weight = ?, length = ?, width = ?, height = ?, product_type = ? WHERE id = ?";
-  connection.query(query, [weight, length, width, height, product_type, id], (err, results) => {
-    if (err) {
-      console.error("❌ Error updating package:", err);
-      return callback(err, null);
-    }
-    callback(null, results);
-  });
+// Actualizar un paquete por ID
+export const updatePackageById = (id, updatedPackage, callback) => {
+  const { shipment_id, weight, length, width, height, product_type } = updatedPackage;
+  const query = `
+    UPDATE packages 
+    SET shipment_id = ?, weight = ?, length = ?, width = ?, height = ?, product_type = ? 
+    WHERE id = ?
+  `;
+  db.query(query, [shipment_id, weight, length, width, height, product_type, id], callback);
 };
 
-// Eliminar paquete
+// Eliminar un paquete por ID
 export const deletePackageById = (id, callback) => {
-  const query = "DELETE FROM packages WHERE id = ?";
-  connection.query(query, [id], (err, results) => {
-    if (err) {
-      console.error("❌ Error deleting package:", err);
-      return callback(err, null);
-    }
-    callback(null, results);
-  });
+  db.query("DELETE FROM packages WHERE id = ?", [id], callback);
 };
