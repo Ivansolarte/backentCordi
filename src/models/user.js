@@ -1,3 +1,4 @@
+//src/models/user.js
 import connection from "../config/db.js";
 
 // consultas toda la tabla user
@@ -23,8 +24,13 @@ export const getUserById = (id, callback) => {
 // Función para crear un nuevo usuario
 export const createUser = (userData, callback) => {
   const query =
-    "INSERT INTO users (name, email, password) VALUES (name, email, password)";
-  const values = [userData.name, userData.email, userData.password];
+    "INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)";
+  const values = [
+    userData.userId,
+    userData.name,
+    userData.email,
+    userData.password,
+  ];
 
   connection.query(query, values, (err, result) => {
     if (err) {

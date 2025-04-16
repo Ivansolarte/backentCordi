@@ -1,4 +1,4 @@
-
+// useController
 import {
   getAllUsers,
   getUserById,
@@ -6,6 +6,9 @@ import {
   updateUserById,
   deleteUserById,
 } from "../models/user.js";
+
+import { v4 as uuidv4 } from 'uuid';
+
 //get total
 export const getAllUsersController = (req, res) => {
   getAllUsers((err, results) => {
@@ -38,7 +41,8 @@ export const createUserController = (req, res) => {
   if (!name || !email || !password) {
     return res.status(400).json({ message: "Name and email are required" });
   }
-  const newUser = { name, email, password };
+  const userId = uuidv4();
+  const newUser = {userId, name, email, password };
   createUser(newUser, (err, createdUser) => {
     if (err) {
       return res.status(500).json({ message: "Error creating user" });
