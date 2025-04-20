@@ -8,14 +8,14 @@ import {
 } from "../models/user.js";
 
 import { v4 as uuidv4 } from "uuid";
-import { redisClient } from "../config/redis.js"; // al inicio del archivo
+import { redisClient } from "../config/redis.js";
 
 //get total
 export const getAllUsersController = async (req, res) => {
   try {
     const cachedUsers = await redisClient.get("users:all");
     if (cachedUsers) {
-      console.log("Lista de usuarios desde Redis");
+      
       return res.status(200).json({ users: JSON.parse(cachedUsers) });
     }
     getAllUsers(async (err, results) => {
@@ -42,7 +42,7 @@ export const getUsersByIdController = async (req, res) => {
   try {
     const cachedUser = await redisClient.get(`user:${userId}`);
     if (cachedUser) {
-      console.log("Usuario desde Redis");
+     
       return res.status(200).json({ user: JSON.parse(cachedUser) });
     }
 
@@ -74,19 +74,46 @@ export const getUsersByIdController = async (req, res) => {
   //   res.status(200).json({ user: results[0] });
   // });
 };
+
 //para crear
 export const createUserController = (req, res) => {
   const { name, email, password } = req.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: "Name and email are required" });
-  }
-  const userId = uuidv4();
-  const newUser = { userId, name, email, password };
 
-  createUser(newUser, (err, createdUser) => {
+    if (!name || !email || !password) {
+    return res
+      .status(400)
+      .json({ message: "Todos los campos son obligatorios" });
+  }
+  
+  if (name.length > 100 || email.length > 100 || password.length > 100) {
+    return res
+      .status(400)
+      .json({ message: "Los campos no deben superar los 100 caracteres" });
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Email inválido" });
+  }
+
+ 
+  const cleanName = name.toLowerCase();
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanPassword = password.trim().toLowerCase(); 
+
+  const userId = uuidv4();
+  const newUser = {
+    userId,
+    name: cleanName,
+    email: cleanEmail,
+    password: cleanPassword, // Idealmente aquí deberías encriptarla
+  };
+
+  createUser(newUser,  (err, createdUser) => {
     if (err) {
-      return res.status(500).json({ message: "Error creating user" });
+      return res.status(500).json({ message: "Error al crear el usuario" });
     }
+
     res.status(201).json({ user: createdUser });
   });
 };
@@ -105,13 +132,14 @@ export const updateUserByIdController = (req, res) => {
       .json({ message: "All fields (name, email, password) are required" });
   }
   // accion para actualizar
-  updateUserById(userId, { name, email, password }, (err, result) => {
+  updateUserById(userId, { name, email, password }, async(err, result) => {
     if (err) {
       return res.status(500).json({ message: "Error updating user" });
     }
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "User not found" });
     }
+    await redisClient.delPattern("users:all:*");
     res.status(200).json({ message: "User updated successfully" });
   });
 };

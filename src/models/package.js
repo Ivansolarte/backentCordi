@@ -1,26 +1,27 @@
-import db from "../config/db.js"; // Aquí debes importar tu configuración de conexión a la base de datos (MySQL, etc.)
+import db from "../config/db.js"; 
 
-// Obtener todos los paquetes
+
 export const getAllPackages = (callback) => {
   db.query("SELECT * FROM packages", callback);
 };
 
-// Obtener un paquete por ID
+
 export const getPackageById = (id, callback) => {
   db.query("SELECT * FROM packages WHERE id = ?", [id], callback);
 };
 
-// Crear un nuevo paquete
+
 export const createPackage = (newPackage, callback) => {
-  const { packageId, shipment_id, weight, length, width, height, product_type } = newPackage;
+ 
+  const {  shipment_id, weight, width, height, product_type } = newPackage;
   const query = `
-    INSERT INTO packages (id, shipment_id, weight, length, width, height, product_type) 
-    VALUES (UUID(), ?, ?, ?, ?, ?, ?)
+    INSERT INTO packages (shipment_id, weight, width, height, product_type) 
+    VALUES ( ?, ?, ?, ?, ?)
   `;
-  db.query(query, [shipment_id, weight, length, width, height, product_type], callback);
+  db.query(query, [shipment_id, weight, width, height, product_type], callback);
 };
 
-// Actualizar un paquete por ID
+
 export const updatePackageById = (id, updatedPackage, callback) => {
   const { shipment_id, weight, length, width, height, product_type } = updatedPackage;
   const query = `
@@ -31,7 +32,7 @@ export const updatePackageById = (id, updatedPackage, callback) => {
   db.query(query, [shipment_id, weight, length, width, height, product_type, id], callback);
 };
 
-// Eliminar un paquete por ID
+
 export const deletePackageById = (id, callback) => {
   db.query("DELETE FROM packages WHERE id = ?", [id], callback);
 };

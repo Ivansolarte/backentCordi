@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 
 // Clave secreta para firmar el JWT (usa una variable de entorno en producción)
-const JWT_SECRET = process.env.JWT_SECRET || 'mi_clave_secreta';
+const JWT_SECRET = '1234';
 const JWT_EXPIRATION = '1h';  // El token expirará en 1 hora
 
 // Función para generar un JWT

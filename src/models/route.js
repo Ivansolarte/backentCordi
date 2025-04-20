@@ -1,11 +1,15 @@
 import pool from "../config/db.js";
+import connection from "../config/db.js";
 import { redisClient } from "../config/redis.js";
 
 export const getAllRoutes = async (callback) => {
-  const cached = await redisClient.get("routes:all");
-  if (cached) return callback(null, JSON.parse(cached));
 
-  pool.query("SELECT * FROM routes", (err, results) => {
+
+
+  const query = "SELECT * FROM routes";
+  connection.query(query, (err, results) => {
+
+    
     if (err) return callback(err);
     redisClient.set("routes:all", JSON.stringify(results));
     callback(null, results);

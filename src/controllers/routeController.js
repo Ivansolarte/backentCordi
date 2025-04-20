@@ -7,6 +7,8 @@ import {
 } from "../models/route.js";
 
 export const getAllRoutesController = (req, res) => {
+
+  
   getAllRoutes((err, results) => {
     if (err) return res.status(500).json({ message: "Error fetching routes" });
     res.status(200).json({ routes: results });

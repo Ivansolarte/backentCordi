@@ -35,7 +35,7 @@ import {
     });
   };
   
-  // Crear nuevo paquete
+  // Crear nuevo paquete usuario
   export const createPackageController = (req, res) => {
     const { shipment_id, weight, length, width, height, product_type } = req.body;
     if (!shipment_id || !weight || !length || !width || !height || !product_type) {

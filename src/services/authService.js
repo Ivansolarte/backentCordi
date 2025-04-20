@@ -8,8 +8,7 @@ const JWT_SECRET = "1234";
 const JWT_EXPIRATION = '1h';
 
 export const authenticateUser = (email, password, callback) => {
-    console.log(email, password,"service");
-    
+      
   const query = 'SELECT * FROM users WHERE email = ?';
 
   connection.query(query, [email], (err, results) => {
@@ -20,9 +19,7 @@ export const authenticateUser = (email, password, callback) => {
         estado: false
       }, null);
     }
-
     const user = results[0];
-    console.log(user);
     
     if (!user) {
         return callback({
@@ -32,9 +29,6 @@ export const authenticateUser = (email, password, callback) => {
         }, null);
     }
     
-    console.log(user.password,"<==1");
-    console.log(password,"<==2");
-
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
       return callback({
@@ -45,7 +39,7 @@ export const authenticateUser = (email, password, callback) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id },
       JWT_SECRET,
       { expiresIn: JWT_EXPIRATION }
     );

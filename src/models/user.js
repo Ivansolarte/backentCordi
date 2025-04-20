@@ -1,8 +1,8 @@
-//src/models/user.js
+
 import connection from "../config/db.js";
 import bcrypt from 'bcryptjs';
 
-// consultas toda la tabla user
+
 export const getAllUsers = (callback) => {
   const query = "SELECT * FROM users";
   connection.query(query, (err, results) => {
@@ -14,7 +14,7 @@ export const getAllUsers = (callback) => {
   });
 };
 
-// consulta por ID
+
 export const getUserById = (id, callback) => {
   const query = "SELECT * FROM users WHERE id = ?";
   connection.query(query, [id], (err, results) => {
@@ -22,26 +22,38 @@ export const getUserById = (id, callback) => {
   });
 };
 
-// Función para crear un nuevo usuario
-export const createUser = (userData, callback) => {
-  const hashedPassword = bcrypt.hashSync(userData.password, 10);
-  const query =
-    "INSERT INTO users ( name, email, password) VALUES (?, ?, ?)";
-  const values = [
-    userData.name,
-    userData.email,
-    hashedPassword,
-  ];
 
-  connection.query(query, values, (err, result) => {
-    if (err) {
-      console.error("❌ Error creating user:", err);
-      return callback(err, null);
-    }
-    callback(null, { id: result.insertId, ...userData });
-  });
+export const createUser = (userData, callback) => {
+  
+  try {
+    const hashedPassword = bcrypt.hashSync(userData.password, 10);
+
+    const query = "INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)";
+    const values = [
+      userData.name.toLowerCase(),
+      userData.email.trim().toLowerCase(),
+      hashedPassword,
+      "usuario",
+    ];
+
+    connection.query(query, values, (err, result) => {
+      if (err) {
+        console.error("❌ Error creating user:", err);
+        return callback(err, null);
+      }
+
+      callback(null, {
+        id: result.insertId,
+        name: userData.name,
+        email: userData.email,
+      });
+    });
+  } catch (error) {
+    callback(error, null);
+  }
 };
-// consulta para actualizar
+
+
 export const updateUserById = (id, userData, callback) => {
   const { name, email, password } = userData;
   const query =
@@ -54,7 +66,7 @@ export const updateUserById = (id, userData, callback) => {
     callback(null, results);
   });
 };
-//consul;ta para eliminar
+
 export const deleteUserById = (id, callback) => {
   const query = "DELETE FROM users WHERE id = ?";
   connection.query(query, [id], (err, results) => {

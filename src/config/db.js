@@ -1,7 +1,6 @@
 import mysql from 'mysql2';
-console.log('🌍 ENTORNO:', process.env.DB_HOST);
-console.log('🌍 ENTORNO:', process.env.DB_USER);
-// Crear la conexión
+
+//  conexión
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -13,10 +12,10 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) {
-      console.error('❌ Error de conexión a MySQL:', err);
+      console.error(' Error de conexión a MySQL:', err);
       return;
     }
-    console.log('✅ Conectado a la base de datos MySQL');
+    console.log(' Conectado a la base de datos MySQL');
   });
 
 export default connection;
